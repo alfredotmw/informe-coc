@@ -44,6 +44,22 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font-fami
 .inf-tabs button { font: inherit; font-size: var(--cds-font-size-body); background: none; border: 0; border-bottom: 2px solid transparent; color: var(--color-fg-muted); padding: var(--cds-pad-sm) var(--cds-pad-md); cursor: pointer; white-space: nowrap; margin-bottom: -1px; }
 .inf-tabs button[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); font-weight: var(--cds-font-weight-medium); }
 .inf-tabs button:hover { color: var(--color-fg); }
+[hidden] { display: none !important; }
+.inf-subtabs { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); margin-top: calc(-1 * var(--cds-gap-sm)); }
+.inf-subtabs button { font: inherit; font-size: var(--cds-font-size-caption); background: var(--color-panel); color: var(--color-fg-muted); border: 1px solid var(--color-border-line); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.inf-subtabs button[aria-pressed="true"] { background: var(--c0); border-color: var(--c0); color: #fff; }
+.inf-stack { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--cds-chart-muted); margin: 6px 0 6px; }
+.inf-stack span { display: block; height: 100%; }
+.inf-leg { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.inf-leg i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: 0; }
+.inf-scol { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 0; font-size: var(--cds-font-size-caption); }
+.inf-scol .st { width: 100%; max-width: 32px; display: flex; flex-direction: column-reverse; border-radius: 4px 4px 0 0; overflow: hidden; }
+.inf-scol .st span { display: block; width: 100%; }
+.inf-scol .l { color: var(--color-fg-muted); margin-top: 4px; white-space: nowrap; min-height: 1.2em; }
+.inf-scol .v { font-variant-numeric: tabular-nums; margin-bottom: 2px; }
+.inf-scol.sel .l { color: var(--color-fg); font-weight: 600; }
+:root { --st-ok: #2e9d5b; --st-aus: #d6453d; --st-pen: #c9ced8; }
+@media (prefers-color-scheme: dark) { :root { --st-ok: #4cc38a; --st-aus: #ef6b5e; --st-pen: #4a5260; } }
 .inf-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); gap: var(--cds-gap-md); }
 .inf-kpi { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); }
 .inf-kpi .lbl { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
@@ -72,6 +88,8 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font-fami
 .inf-tbl th { position: sticky; top: 0; background: var(--color-panel); text-align: left; font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); }
 .inf-tbl td { padding: var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); }
 .inf-tbl .num { text-align: right; }
+.inf-tbl td.ok { color: var(--st-ok); }
+.inf-tbl td.aus { color: var(--st-aus); }
 .inf-tbl tr.link { cursor: pointer; }
 .inf-tbl tr.link:hover td { background: var(--color-bg); }
 .inf-tbl .cell-bar { display: inline-block; height: 8px; border-radius: 4px; background: var(--inf-c); vertical-align: middle; margin-right: 6px; }
@@ -112,20 +130,25 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font-fami
     <button role="tab" data-serv="Quimioterapia" id="tab-quimioterapia">Quimioterapia</button>
     <button role="tab" data-serv="Electro y Mapeos" id="tab-electro">Electro y mapeos</button>
   </nav>
+  <div class="inf-subtabs lx-subtabs" hidden role="group" aria-label="Subdivisión de imágenes">
+    <button data-sub="">Todas</button><button data-sub="Tomografía">Tomografía</button><button data-sub="Ecografía">Ecografía</button><button data-sub="PET">PET</button><button data-sub="Cámara gamma">Cámara gamma</button><button data-sub="Radiografía">Radiografía</button><button data-sub="TAC de marcación">TAC de marcación</button>
+  </div>
 
   <!-- RESUMEN -->
   <section class="lx-page-resumen" id="resumen">
     <div class="inf-grid">
       <div class="inf-card wide" id="servicios">
         <h2>Servicios</h2>
-        <p class="note">Cada servicio con sus propios números. Pacientes nuevos: primera vez que el paciente llega a ese servicio con ese derivante (las sesiones siguientes no suman). Tocá una fila para ver el detalle.</p>
+        <p class="note">Turnos asignados con su resultado. Pacientes atendidos y nuevos cuentan solo turnos completados; un paciente nuevo suma una vez aunque tenga muchas sesiones. Tocá una fila para ver el detalle.</p>
         <div class="inf-tbl-wrap">
           <table class="inf-tbl lx-res">
             <thead><tr>
               <th>Servicio</th>
-              <th class="num">Turnos</th>
-              <th class="num">Pacientes</th>
-              <th class="num">Pacientes nuevos</th>
+              <th class="num">Turnos asignados</th>
+              <th class="num">Completados</th>
+              <th class="num">Ausentes</th>
+              <th class="num opt">Pacientes atendidos</th>
+              <th class="num opt">Pacientes nuevos</th>
               <th class="num opt">Ausentismo</th>
               <th class="opt">Práctica más realizada</th>
               <th class="opt">Principal derivante</th>
@@ -159,8 +182,8 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font-fami
   <!-- SERVICIO -->
   <section class="lx-page-serv" id="servicio" hidden>
     <div class="inf-kpis">
-      <div class="inf-kpi"><div class="lbl">Turnos agendados</div><div class="val lx-k" data-field="turnos">—</div><div class="delta lx-d" data-k="turnos"></div></div>
-      <div class="inf-kpi"><div class="lbl">Pacientes distintos</div><div class="val lx-k" data-field="pacientes">—</div><div class="delta lx-d" data-k="pacientes"></div></div>
+      <div class="inf-kpi"><div class="lbl">Turnos asignados</div><div class="val lx-k" data-field="turnos">—</div><div class="inf-stack lx-stack"></div><div class="inf-leg lx-leg"></div></div>
+      <div class="inf-kpi"><div class="lbl">Pacientes atendidos</div><div class="val lx-k" data-field="pacientes">—</div><div class="delta lx-d" data-k="pacientes"></div></div>
       <div class="inf-kpi"><div class="lbl">Pacientes nuevos derivados</div><div class="val lx-k" data-field="nuevos">—</div><div class="delta lx-d" data-k="nuevos"></div></div>
       <div class="inf-kpi lx-only-rt"><div class="lbl">Inicios de tratamiento</div><div class="val lx-k" data-field="inicios_rt">—</div><div class="delta lx-d" data-k="inicios_rt"></div></div>
       <div class="inf-kpi"><div class="lbl">Ausentismo</div><div class="val lx-k" data-field="ausentismo">—</div><div class="delta lx-d" data-k="ausentismo"></div></div>
@@ -169,27 +192,28 @@ body { margin: 0; background: var(--color-bg); color: var(--color-fg); font-fami
 
     <div class="inf-grid" style="margin-top: var(--cds-gap-md)">
       <div class="inf-card wide" id="evolucion">
-        <h2>Turnos por día</h2><p class="note lx-evo-note">Turnos agendados del servicio por día.</p>
+        <h2>Turnos por día</h2><p class="note lx-evo-note">Turnos asignados del servicio por día.</p>
+        <div class="inf-leg" style="margin-bottom:6px"><span><i style="background:var(--st-ok)"></i>Completados</span><span><i style="background:var(--st-aus)"></i>Ausentes</span><span><i style="background:var(--st-pen)"></i>Pendientes / otros</span></div>
         <div class="inf-cols lx-evo"></div>
       </div>
       <div class="inf-card" id="practicas">
-        <h2>Lo que más se hizo</h2><p class="note">Turnos por práctica en el período, sin contar ausentes.</p>
+        <h2>Lo que más se hizo</h2><p class="note">Prácticas realizadas en el período (solo turnos completados).</p>
         <div class="inf-bars lx-chart" data-chart="practicas"></div>
       </div>
       <div class="inf-card" id="derivantes">
-        <h2>Principales derivantes</h2><p class="note">Pacientes nuevos derivados al servicio: cada paciente cuenta una vez, aunque tenga muchas sesiones. Los turnos a nombre de Miño o Duarte se asignan al médico que derivó al paciente.</p>
+        <h2>Principales derivantes</h2><p class="note">Pacientes nuevos atendidos en el servicio (turnos completados): cada paciente cuenta una vez, aunque tenga muchas sesiones. Los turnos a nombre de Miño o Duarte se asignan al médico que derivó al paciente.</p>
         <div class="inf-bars lx-chart" data-chart="derivantes"></div>
       </div>
       <div class="inf-card" id="obras-sociales">
-        <h2>Obras sociales</h2><p class="note">Pacientes distintos del servicio por obra social, sin contar ausentes.</p>
+        <h2>Obras sociales</h2><p class="note">Pacientes atendidos (turnos completados) por obra social.</p>
         <div class="inf-bars lx-chart" data-chart="obras_sociales"></div>
       </div>
       <div class="inf-card" id="patologias">
-        <h2>Patologías</h2><p class="note">Pacientes distintos del servicio con patología cargada, agrupada.</p>
+        <h2>Patologías</h2><p class="note">Pacientes atendidos con patología cargada, agrupada.</p>
         <div class="inf-bars lx-chart" data-chart="patologias"></div>
       </div>
       <div class="inf-card" id="edades">
-        <h2>Edad de los pacientes</h2><p class="note">Pacientes distintos del servicio por rango de edad.</p>
+        <h2>Edad de los pacientes</h2><p class="note">Pacientes atendidos por rango de edad.</p>
         <div class="inf-cols lx-edad"></div>
       </div>
       <div class="inf-card" id="secretarias">
@@ -230,7 +254,7 @@ const DATA_URL = 'https://script.google.com/macros/s/AKfycbxRFT_0WiRQIKCWEpWqLU0
 // Motor mínimo: lee datos.json (solo totales) y maneja filtros en la URL
 const dash = (() => {
   let store = null, err = null; const subs = [];
-  const defaults = { dia: null, modo: 'dia', servicio: 'Resumen' };
+  const defaults = { dia: null, modo: 'dia', servicio: 'Resumen', sub: '' };
   let params = { ...defaults };
   try { const q = new URLSearchParams(location.search); for (const k of Object.keys(defaults)) if (q.get(k)) params[k] = q.get(k); } catch (e) {}
   const run = () => subs.forEach((f) => { try { f(); } catch (e) { console.error(e); } });
@@ -281,11 +305,12 @@ document.querySelector('.lx-ayer').addEventListener('click', () => {
   const k = dash.data('kpis'); dash.setParams({ dia: k.status === 'ok' ? ultimoCompleto(k.data) : hoyStr(), modo: 'dia' });
 });
 const irA = (serv) => {
-  dash.setParams({ servicio: serv });
+  dash.setParams({ servicio: serv, sub: '' });
   const b = [...document.querySelectorAll('.inf-tabs button')].find((x) => x.dataset.serv === serv);
   if (b) dash.setLink(b.id);
 };
 document.querySelectorAll('.inf-tabs button').forEach((b) => b.addEventListener('click', () => irA(b.dataset.serv)));
+document.querySelectorAll('.lx-subtabs button').forEach((b) => b.addEventListener('click', () => dash.setParams({ sub: b.dataset.sub })));
 document.querySelector('.lx-res').addEventListener('click', (ev) => { const tr = ev.target.closest('tr[data-serv]'); if (tr) irA(tr.dataset.serv); });
 {
   const named = document.getElementById(location.hash.slice(1));
@@ -343,6 +368,27 @@ function cols(el, rows, label, value, colorOf, tipHead, tipLine, labelEvery) {
     el.appendChild(c);
   });
 }
+function apiladas(el, rows, sel, labelEvery) {
+  el.replaceChildren();
+  if (!rows.length) return vacio(el);
+  const max = Math.max(1, ...rows.map((r) => r.turnos));
+  const card = el.closest('.inf-card');
+  rows.forEach((r, i) => {
+    const pen = r.turnos - r.completados - r.ausentes;
+    const c = document.createElement('div'); c.className = 'inf-scol' + (r.periodo === sel ? ' sel' : '');
+    const v = document.createElement('div'); v.className = 'v'; v.textContent = rows.length <= 16 || r.periodo === sel ? nf.format(r.turnos) : '';
+    const st = document.createElement('div'); st.className = 'st'; st.style.height = (80 * r.turnos / max) + '%';
+    for (const [n, col] of [[r.completados, '--st-ok'], [r.ausentes, '--st-aus'], [pen, '--st-pen']]) {
+      if (!n) continue; const sp = document.createElement('span'); sp.style.height = (100 * n / r.turnos) + '%'; sp.style.background = 'var(' + col + ')';
+      if (sel && r.periodo !== sel) sp.style.opacity = '.55'; st.appendChild(sp);
+    }
+    const l = document.createElement('div'); l.className = 'l'; l.textContent = (i % (labelEvery || 1) === 0 || r.periodo === sel) ? r.periodo.slice(8) : '';
+    c.append(v, st, l);
+    c.addEventListener('mousemove', (ev) => showTip(card, ev, cap(fPer(r.periodo)), nf.format(r.turnos) + ' asignados · ' + nf.format(r.completados) + ' completados · ' + nf.format(r.ausentes) + ' ausentes · ' + nf.format(pen) + ' pendientes'));
+    c.addEventListener('mouseleave', () => hideTip(card));
+    el.appendChild(c);
+  });
+}
 function tabla(tb, rows, cells, rowAttrs) {
   tb.replaceChildren();
   for (const r of rows) {
@@ -359,13 +405,19 @@ dash.onData(() => {
   if (kp.status === 'ok' && !p.dia) { dash.setParams({ dia: ultimoCompleto(kp.data) }); return; }
   const modo = p.modo === 'mes' ? 'mes' : 'dia';
   const serv = SERVS.includes(p.servicio) ? p.servicio : 'Resumen';
+  const SUBS = ['Tomografía', 'Ecografía', 'PET', 'Cámara gamma', 'Radiografía', 'TAC de marcación'];
+  const esImg = serv === 'Diagnóstico por Imágenes';
+  const sub = esImg && SUBS.includes(p.sub) ? p.sub : '';
+  const key = sub ? 'IMG:' + sub : serv;
+  document.querySelector('.lx-subtabs').hidden = !esImg;
+  document.querySelectorAll('.lx-subtabs button').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.sub === sub)));
   document.querySelectorAll('.lx-modo').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.modo === modo)));
   document.querySelectorAll('.inf-tabs button').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.serv === serv)));
   if (diaIn !== document.activeElement) diaIn.value = p.dia || '';
   const per = periodo();
   const ant = modo === 'mes' ? 'mes anterior' : 'día anterior';
   document.querySelector('.lx-foot').textContent = window.__generado ? 'Datos de la agenda al ' + window.__generado.split(' ')[0].split('-').reverse().join('/') + ' ' + window.__generado.split(' ')[1] + ' · Se actualiza cada hora · Solo totales, sin datos personales de pacientes.' : '';
-  document.querySelector('.lx-sub').textContent = cap(fPer(per)) + (serv === 'Resumen' ? ' · todos los servicios' : ' · ' + serv);
+  document.querySelector('.lx-sub').textContent = cap(fPer(per)) + (serv === 'Resumen' ? ' · todos los servicios' : ' · ' + serv + (sub ? ' › ' + sub : ''));
   document.querySelector('.lx-page-resumen').hidden = serv !== 'Resumen';
   document.querySelector('.lx-page-serv').hidden = serv === 'Resumen';
 
@@ -374,7 +426,8 @@ dash.onData(() => {
     if (r.status !== 'ok') fallo(tb, r.status);
     else {
       const rows = r.data.filter((x) => x.periodo === per && SERVS.includes(x.servicio)).sort((a, b) => SERVS.indexOf(a.servicio) - SERVS.indexOf(b.servicio));
-      tabla(tb, rows, (x) => [[x.servicio], [nf.format(x.turnos), 'num'], [nf.format(x.pacientes), 'num'], [nf.format(x.nuevos), 'num'],
+      const kx = (x) => (kp.status === 'ok' ? kp.data.find((r) => r.periodo === x.periodo && r.servicio === x.servicio) : null) || {};
+      tabla(tb, rows, (x) => [[x.servicio], [nf.format(x.turnos), 'num'], [nf.format(kx(x).completados || 0), 'num ok'], [nf.format(kx(x).ausentes || 0), 'num aus'], [nf.format(x.pacientes), 'num opt'], [nf.format(x.nuevos), 'num opt'],
         [x.ausentismo == null ? '—' : pf.format(x.ausentismo), 'num opt'], [x.practica_top || '—', 'opt'], [x.derivante_top || '—', 'opt'], [x.obra_social_top || '—', 'opt']],
         (tr, x) => { tr.dataset.key = enc(x.periodo) + ',' + enc(x.servicio); tr.dataset.serv = x.servicio; tr.className = 'link'; });
     }
@@ -391,10 +444,22 @@ dash.onData(() => {
 
   const esRT = serv === 'Radioterapia';
   document.querySelectorAll('.lx-only-rt').forEach((el) => { el.hidden = !esRT; });
-  const where = 'periodo=' + enc(per) + '&servicio=' + enc(serv);
+  const where = 'periodo=' + enc(per) + '&servicio=' + enc(key);
 
   // KPIs
-  const krow = kp.status === 'ok' ? kp.data.find((r) => r.periodo === per && r.servicio === serv) : null;
+  const krow = kp.status === 'ok' ? kp.data.find((r) => r.periodo === per && r.servicio === key) : null;
+  {
+    const st = document.querySelector('.lx-stack'), lg = document.querySelector('.lx-leg');
+    st.replaceChildren(); lg.replaceChildren();
+    if (krow && krow.turnos) {
+      const pen = krow.turnos - krow.completados - krow.ausentes;
+      for (const [n, c, t] of [[krow.completados, '--st-ok', 'completados'], [krow.ausentes, '--st-aus', 'ausentes'], [pen, '--st-pen', 'pendientes']]) {
+        const sp = document.createElement('span'); sp.style.width = (100 * n / krow.turnos) + '%'; sp.style.background = 'var(' + c + ')'; st.appendChild(sp);
+        const l = document.createElement('span'); const i = document.createElement('i'); i.style.background = 'var(' + c + ')';
+        l.append(i, document.createTextNode(nf.format(n) + ' ' + t)); lg.appendChild(l);
+      }
+    }
+  }
   document.querySelectorAll('.lx-k').forEach((el) => {
     const f = el.dataset.field;
     el.setAttribute('data-where', where);
@@ -423,14 +488,13 @@ dash.onData(() => {
     if (kp.status !== 'ok') fallo(el, kp.status);
     else {
       let desde, hasta, nota;
-      if (modo === 'mes') { desde = per + '-01'; hasta = per + '-31'; nota = 'Turnos agendados por día en ' + fPer(per) + '.'; }
-      else { desde = addDias(per, -29); hasta = per; nota = 'Turnos agendados por día, últimos 30 días hasta el ' + fDia(per) + '. En color, el día elegido.'; }
+      if (modo === 'mes') { desde = per + '-01'; hasta = per + '-31'; nota = 'Turnos asignados por día en ' + fPer(per) + '.'; }
+      else { desde = addDias(per, -29); hasta = per; nota = 'Turnos asignados por día, últimos 30 días hasta el ' + fDia(per) + '. En color, el día elegido.'; }
       document.querySelector('.lx-evo-note').textContent = nota;
-      const rows = kp.data.filter((r) => r.servicio === serv && r.periodo.length === 10 && r.periodo >= desde && r.periodo <= hasta)
+      const rows = kp.data.filter((r) => r.servicio === key && r.periodo.length === 10 && r.periodo >= desde && r.periodo <= hasta)
         .map((r) => ({ ...r, dd: r.periodo.slice(8) }));
       const every = el.clientWidth < 500 ? 4 : 2;
-      cols(el, rows, 'dd', 'turnos', (r) => (modo === 'dia' && r.periodo !== per ? 'var(--cds-chart-muted)' : dash.colors[0]),
-        (r) => cap(fPer(r.periodo)), (r) => nf.format(r.turnos) + ' turnos · ' + nf.format(r.pacientes) + ' pacientes', every);
+      apiladas(el, rows, modo === 'dia' ? per : null, every);
     }
   }
 
@@ -446,7 +510,7 @@ dash.onData(() => {
     const el = document.querySelector('[data-chart="' + id + '"]');
     const d = dash.data(id);
     if (d.status !== 'ok') { fallo(el, d.status); continue; }
-    hbars(el, d.data.filter((r) => r.periodo === per && r.servicio === serv).sort((a, b) => b[value] - a[value]).slice(0, n), label, value, color, line);
+    hbars(el, d.data.filter((r) => r.periodo === per && r.servicio === key).sort((a, b) => b[value] - a[value]).slice(0, n), label, value, color, line);
   }
 
   // Edades
@@ -454,7 +518,7 @@ dash.onData(() => {
     const el = document.querySelector('.lx-edad'); const d = dash.data('edades');
     if (d.status !== 'ok') fallo(el, d.status);
     else {
-      const rows = d.data.filter((r) => r.periodo === per && r.servicio === serv).sort((a, b) => a.orden - b.orden);
+      const rows = d.data.filter((r) => r.periodo === per && r.servicio === key).sort((a, b) => a.orden - b.orden);
       const tot = rows.reduce((s, r) => s + r.pacientes, 0);
       cols(el, rows, 'rango', 'pacientes', () => dash.colors[4], (r) => r.rango + ' años', (r) => nf.format(r.pacientes) + ' pacientes (' + pf.format(r.pacientes / tot) + ')', 1);
     }
